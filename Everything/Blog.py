@@ -256,7 +256,6 @@ class blog_single(Handler):
 #class to display the main page 
 class Mainpage(Handler):
 	def get(self):
-		self.write('fuck')
 		# username = self.request.get('username')
 		# if valid_username(username):
 		# 	Blogs = db.GqlQuery("SELECT * FROM blog ""ORDER BY created DESC ")
