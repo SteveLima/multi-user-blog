@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Single blog page</title>
+	<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="/stylesheets/main.css">
+</head>
+<body>
+	<div class="container">
+		
+		{% for Blog in Blogs %}
+			<div class="line">
+				<div class="row"> 
+					<div class="title col-md-9">
+						{{Blog.title}}
+					</div>
+					<div class="date col-md-3">
+						{{Blog.created}}
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<pre class="content col-md-12">
+					{{Blog.content}}
+				</pre>
+			</div>
+		{% endfor %}
+	</div>
+</body>
+</html>

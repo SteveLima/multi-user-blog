@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Login page</title>
+	<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="/stylesheets/main.css">
+</head>
+<body>
+	<div class="container ">
+		<div class="row welcome_top">
+			<div class="col-md-12 heading">
+				Welcome to bloggert 
+			</div>
+		</div>
+		<form method="post">
+			<div class="row">
+				<div class="title ">
+				Username:
+				</div>
+				<input class="box1" type="text" name="username">
+			</div>
+			<div>{{error}}</div>
+			<div class="row">
+				<div class="title">
+				Password:
+				</div>
+				<input class="box1" type="text" name="password">
+			</div>
+			<div class="row ">
+				<div class="col-offset-md-3">
+					<input class="button space" type="submit" value="Login" >
+				</div>
+			</div>
+		</form>
+		
+	</div>
+</body>
+</html>
