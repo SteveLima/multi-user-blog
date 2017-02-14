@@ -218,10 +218,10 @@ class Login(Handler):
 
 class welcome(Handler):
 	def get(self):
-		# if self.user:
-		self.render('mainpage.html' , username = self.user.name)
-		# else:
-		# 	self.redirect('/signup')
+		if self.user:
+			self.render('mainpage.html' , username = self.user.name)
+		else:
+		 	self.redirect('/signup')
 
 class Logout(Handler):
 	def get(self):
