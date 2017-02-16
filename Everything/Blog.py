@@ -26,13 +26,8 @@ from google.appengine.ext import db
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment ( loader = jinja2.FileSystemLoader(template_dir))
 
-secret = "asasdjklfsiuhewjblhasdfy38"
+secret = "a"
 
-def make_pw_hash(name,pw,salt=None):
-	if not salt:
-		salt = make_salt()
-		h = hashlib.sha256(name+pw+salt).hexdigest()
-		return '%s,%s'% (salt,h)
 
 
 def render_str(self, template, **params):
@@ -47,16 +42,7 @@ def check_secure_val(secure_val):
 	if secure_val == make_secure_val(val):
 		return val
 
-def make_salt(length=5):
-	return ''.join(random.choice(letters) for x in range(length))
-	
 
-def valid_pw(name,password,h):
-	salt = h.split(',')[0]
-	return h == make_pw_hash (name,password,self)
-
-def users_key(group ='default'):
-	return db.Key.from_path('users',group)
 
 
 class Handler(webapp2.RequestHandler):
@@ -72,7 +58,7 @@ class Handler(webapp2.RequestHandler):
 
 	def set_secure_cookie(self,name,val):
 		cookie_val = make_secure_val(val)
-		self.response.headers.add_header('set-cookie', '%s|%s;path=/' %(name,cookie_val))
+		self.response.headers.add_header('Set-Cookie', '%s=%s; Path=/' % (name, cookie_val))
 
 	def read_secure_cookie(self,name):
 		cookie_val = self.request.cookies.get(name)
@@ -86,42 +72,88 @@ class Handler(webapp2.RequestHandler):
 
 	def initialize (self, *a , **kw):
 		webapp2.RequestHandler.initialize(self, *a ,**kw)
-		uid = self.read_secure_cookie ('user_id')
+		uid = self.read_secure_cookie('user_id')
 		self.user = uid and User.by_id(int(uid))
+
+def make_salt(length=5):
+	return ''.join(random.choice(letters) for x in range(length))
+	
+
+def valid_pw(name,password,h):
+	salt = h.split(',')[0]
+	return h == make_pw_hash(name, password, salt)
+
+def users_key(group ='default'):
+	return db.Key.from_path('users',group)
+
+def make_pw_hash(name,pw,salt=None):
+	if not salt:
+		salt = make_salt()
+	h = hashlib.sha256(name+pw+salt).hexdigest()
+	return '%s,%s'% (salt,h)
+
 
 
 
 class User(db.Model):
 	name = db.StringProperty(required = True)
 	pw_hash = db.StringProperty(required = True)
-	email = db.StringProperty ()
+	email = db.StringProperty()
 
 	@classmethod
 	def by_id(cls,uid):
-		return user.get_by_id(uid,parent = users_key())
+		return User.get_by_id(uid,parent = users_key())
 
 	@classmethod
 	def by_name(cls,name):
-		u = User.all().filter('name=',name).get()
+		u = User.all().filter('name =',name).get()
 		return u 
 
 	@classmethod
-	def login2 (cls,name,pw):
-		u = cls.by_name(name)
-		if u and valid_pw(name,pw,u.pw_hash):
-			return u 
-
-	@classmethod
-	def register (cls,name,pw,email = None):
+	def register(cls,name,pw,email = None):
 		pw_hash = make_pw_hash(name,pw)
 		return User(parent=users_key(), name = name , pw_hash = pw_hash, email = email)
 
+	@classmethod
+	def login2(cls,name,pw):
+		u = cls.by_name(name)
+		if u and valid_pw(name, pw, u.pw_hash):
+			return u 
 
 
 class blog(db.Model):
 	title = db.StringProperty(required = True)
 	content = db.TextProperty( required = True)
 	created = db.DateTimeProperty(auto_now_add = True)
+	likes = db.IntegerProperty()
+	user_likes = db.StringProperty()
+
+	
+
+
+
+# def liking(Handler):
+# 	l = blog.all().filter('blog.user_likes =' self.user.name).get()
+# 	if self.user.name != l :
+# 		p = blog(user_likes = self.user.name)
+# 		p.put()
+# 		like_num = blog.user_likes.count (read_policy=STRONG_CONSISTENCY, deadline=60, offset=0, limit=1000, start_cursor=None, end_cursor=None)
+# 		blog.likes = like_num
+# 		blog.put()
+
+				# ## stuff for likes system 
+
+# personToDelete = db.GqlQuery("SELECT * FROM Persons WHERE name='Joe'");
+# person = personToDelete[0];
+# person.delete();
+
+
+
+# class Comments(db.Model): 
+# 	blog = db.ReferenceProperty(blog, collection_name = 'comment_section')
+# 	content = db.StringProperty(required = True)
+# 	User =db.ReferenceProperty()
+
 
 USER_RE = re.compile (r"^[a-zA-Z0-9_-]{3,20}$")
 def valid_username(username):
@@ -150,7 +182,7 @@ class Signup(Handler):
 		params = dict(username = self.username , email = self.email)
 
 		if not valid_username(self.username):
-			params['error_username'] = "That seems to be an invalid username."
+			params['error_username'] = " Invalid username."
 			have_error = True
 
 		if not valid_password(self.password):
@@ -181,7 +213,7 @@ class Signup(Handler):
 			u.put()
 
 			self.login(u)
-			self.redirect('/welcome')
+			self.redirect('/mainpage')
 
 
 # class Register(Signup):
@@ -199,19 +231,18 @@ class Signup(Handler):
 		# 	self.redirect('/welcome')
 
 
-
 class Login(Handler):
 	def get(self):
 		self.render('login.html')
 
-	def post (self):
+	def post(self):
 		username= self.request.get('username')
 		password = self.request.get('password')
 
 		u = User.login2(username,password)
 		if u:
 			self.login(u)
-			self.redirect('/welcome')
+			self.redirect('/mainpage')
 		else:
 			msg = 'invalid login'
 			self.render('login.html', error = msg)
@@ -219,7 +250,8 @@ class Login(Handler):
 class welcome(Handler):
 	def get(self):
 		if self.user:
-			self.render('mainpage.html' , username = self.user.name)
+			Blogs = db.GqlQuery("SELECT * FROM blog ""ORDER BY created DESC ")
+			self.render("mainpage.html",Blogs = Blogs ,  username = self.user.name  )
 		else:
 		 	self.redirect('/signup')
 
@@ -227,8 +259,6 @@ class Logout(Handler):
 	def get(self):
 		self.logout()
 		self.redirect('/signup')
-
-
 
 
 
@@ -256,18 +286,18 @@ class blog_single(Handler):
 #class to display the main page 
 class Mainpage(Handler):
 	def get(self):
-		# username = self.request.get('username')
-		# if valid_username(username):
-		# 	Blogs = db.GqlQuery("SELECT * FROM blog ""ORDER BY created DESC ")
-		# 	self.render("mainpage.html",Blogs = Blogs ,  username = username  )
-		# else:
-		# 	self.redirect('/signup')
+		username = self.request.get('username')
+		if valid_username(username):
+			Blogs = db.GqlQuery("SELECT * FROM blog ""ORDER BY created DESC ")
+			self.render("mainpage.html",Blogs = Blogs ,  username = username  )
+		else:
+			self.redirect('/signup')
 
 
 		
 		
 
-app = webapp2.WSGIApplication([('/mainpage', Mainpage) , ('/newpost',Newpost),('/blog/(\d+)', blog_single), ("/login", Login), ('/signup', Signup), ('/login',Login), ('/logout',Logout), ('/welcome',welcome)], debug=True)
+app = webapp2.WSGIApplication([ ('/newpost',Newpost),('/blog/(\d+)', blog_single), ("/login", Login), ('/signup', Signup), ('/login',Login), ('/logout',Logout), ('/mainpage',welcome)], debug=True)
 
 
 
