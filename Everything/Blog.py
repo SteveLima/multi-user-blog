@@ -120,39 +120,15 @@ class User(db.Model):
 		if u and valid_pw(name, pw, u.pw_hash):
 			return u 
 
+	
+
+
 
 class blog(db.Model):
 	title = db.StringProperty(required = True)
 	content = db.TextProperty( required = True)
 	created = db.DateTimeProperty(auto_now_add = True)
-	likes = db.IntegerProperty()
-	user_likes = db.StringProperty()
-
-	
-
-
-
-# def liking(Handler):
-# 	l = blog.all().filter('blog.user_likes =' self.user.name).get()
-# 	if self.user.name != l :
-# 		p = blog(user_likes = self.user.name)
-# 		p.put()
-# 		like_num = blog.user_likes.count (read_policy=STRONG_CONSISTENCY, deadline=60, offset=0, limit=1000, start_cursor=None, end_cursor=None)
-# 		blog.likes = like_num
-# 		blog.put()
-
-				# ## stuff for likes system 
-
-# personToDelete = db.GqlQuery("SELECT * FROM Persons WHERE name='Joe'");
-# person = personToDelete[0];
-# person.delete();
-
-
-
-# class Comments(db.Model): 
-# 	blog = db.ReferenceProperty(blog, collection_name = 'comment_section')
-# 	content = db.StringProperty(required = True)
-# 	User =db.ReferenceProperty()
+	likes = db.IntegerProperty(required = False) 
 
 
 USER_RE = re.compile (r"^[a-zA-Z0-9_-]{3,20}$")
@@ -216,20 +192,6 @@ class Signup(Handler):
 			self.redirect('/mainpage')
 
 
-# class Register(Signup):
-# 	def done(self):
-# 		self.write('f')
-		# u = User.by_name(self.username)
-		# self.render('index.html',error_username = 'kjhdlasfl')
-		# if u :
-		# 	msg = 'Username has already been taken'
-		# 	self.render('index.html', error_username = msg)
-		# else:
-		# 	u = User.register(self.username,self.password,self.email)
-		# 	u.put()
-		# 	self.login(u)
-		# 	self.redirect('/welcome')
-
 
 class Login(Handler):
 	def get(self):
@@ -259,6 +221,8 @@ class Logout(Handler):
 	def get(self):
 		self.logout()
 		self.redirect('/signup')
+
+
 
 
 
@@ -293,11 +257,16 @@ class Mainpage(Handler):
 		else:
 			self.redirect('/signup')
 
+	def post(self):
+		
+
 
 		
 		
 
 app = webapp2.WSGIApplication([ ('/newpost',Newpost),('/blog/(\d+)', blog_single), ("/login", Login), ('/signup', Signup), ('/login',Login), ('/logout',Logout), ('/mainpage',welcome)], debug=True)
+
+
 
 
 
