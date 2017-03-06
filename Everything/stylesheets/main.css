@@ -1,15 +1,45 @@
 
+html{
+	height: 100%;
+}
+.container{ 
+	max-height: 100%;
+}
+
 body {
 	background-color:#3971cc ;	
 
 }
+.row-eq-height {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+
 .background{
 	background-color:#3971cc ;	
 }
+
+.background-image{
+	background-image: url(http://img15.deviantart.net/cbb7/i/2011/308/6/a/vector_terran_logo_by_elrondsmith-d4f4qkg.png);
+	background-position: bottom right;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+}
+
+.position-container {
+	position: relative;
+}
+
+.position-container .position-bottom {
+	position: absolute;
+	bottom: 0;
+}
+
 .top{
 	font-size: 40px;
 	color: white;
-	width:100%;
 	padding: 10px;
 	text-align: center;	
 	margin-bottom: 30px;
@@ -22,13 +52,9 @@ body {
 
 .sml{
 	color: white;
-	width:117px;
+	font-size: 16px;
 }
 
-.container{ 
-
-
-}
 
  .welcome{
  	font-size: 15px;
@@ -36,10 +62,10 @@ body {
 
 .box1 { 
 border-radius: 10px;
+width:100%;
  }
 
 .box2{
-	width: 600px;
 	height: 400px;
 }
 
@@ -60,24 +86,46 @@ border-radius: 10px;
 	font-size: 40px;
 	color: white;
 }
+
 .margin-offset{
 	margin-left: 55%
 }
+
 .box3{
 	border: solid white 3px;
 }
+
 .link{ 
 text-decoration: none;
 color:white;
  }
 
- .button{
-    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
-    font-size: 15px;
-    border-radius: 8px;
-    background-color: white;
+.button{
+box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+font-size: 15px;
+border-radius: 8px;
+background-color: white;
 
 }
 .space{
+	margin-top: 10px;
+}
+
+.bloggert{
+	color: white;
+	font-size: 40px;
+}
+
+.signup{
+	color: white;
+	font-size: 20px;
+	text-align: bottom;
+}
+
+.middle{
+	text-align: center;
+}
+
+.padding-top{
 	margin-top: 10px;
 }
